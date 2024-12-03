@@ -14,8 +14,6 @@ const loginUser = catchAsync(async (req: Request, res: Response) => {
   });
 
   sendResponse(res, {
-    statusCode: 200,
-    success: true,
     message: "Logged in successfully!",
     data: {
       accessToken: result.accessToken,
@@ -28,14 +26,8 @@ const refreshToken = catchAsync(async (req: Request, res: Response) => {
   const result = await AuthServices.refreshToken(refreshToken);
 
   sendResponse(res, {
-    statusCode: 200,
-    success: true,
     message: "Logged in successfully!",
     data: result,
-    // data: {
-    //   accessToken: result.accessToken,
-    //   needPasswordCHange: result.needPasswordChange,
-    // },
   });
 });
 
@@ -44,8 +36,6 @@ const changePassword = catchAsync(
     await AuthServices.changePassword(req.user, req.body);
 
     sendResponse(res, {
-      statusCode: 200,
-      success: true,
       message: "Password change successfully",
       data: "",
     });
@@ -57,8 +47,6 @@ const forgotPassword = catchAsync(
     await AuthServices.forgotPassword(req.body);
 
     sendResponse(res, {
-      statusCode: 200,
-      success: true,
       message: "Check your email",
       data: "",
     });
@@ -71,8 +59,6 @@ const resetPassword = catchAsync(
     await AuthServices.resetPassword(token, req.body);
 
     sendResponse(res, {
-      statusCode: 200,
-      success: true,
       message: "Password reset successfully",
       data: "",
     });
