@@ -1,0 +1,109 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  role      UserRole  @default(CUSTOMER)
+  status    Status    @default(ACTIVE)
+  createdAt DateTime  @default(now())
+  updateAt  DateTime  @updatedAt
+  admin     Admin?
+  vendor    Vendor?
+  customer  Customer?
+
+  @@map("users")
+}
+
+model Admin {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  user         User     @relation(fields: [email], references: [email])
+  name         String
+  profilePhoto String?
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updateAt     DateTime @updatedAt
+
+  @@map("admins")
+}
+
+model Vendor {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  user          User     @relation(fields: [email], references: [email])
+  name          String
+  profilePhoto  String?
+  isDeleted     Boolean  @default(false)
+  contactNumber String?
+  address       String?
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+  shop          Shop?
+
+  @@map("vendors")
+}
+
+model Customer {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  user          User     @relation(fields: [email], references: [email])
+  name          String
+  profilePhoto  String?
+  isDeleted     Boolean  @default(false)
+  contactNumber String?
+  createdAt     DateTime @default(now())
+  updateAt      DateTime @updatedAt
+
+  @@map("customers")
+}
+
+model Shop {
+  id          String   @id @default(uuid())
+  vendorId    String   @unique
+  vendor      Vendor   @relation(fields: [vendorId], references: [id])
+  name        String
+  description String?
+  logo        String?
+  banner      String?
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
+
+  @@map("shops")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updateAt    DateTime @updatedAt
+
+  @@map("categories")
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  ADMIN
+  VENDOR
+  CUSTOMER
+}
+
+enum Status {
+  ACTIVE
+  BLOCKED
+  DELETED
+}
