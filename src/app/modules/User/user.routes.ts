@@ -1,11 +1,17 @@
 import { NextFunction, Request, Response, Router } from "express";
-import { userController } from "./user.controller";
 import { upload } from "../../../helpers/fileUploader";
 import { UserValidations } from "./user.validation";
 import { auth } from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
+import { UserControllers } from "./user.controller";
 
 const router = Router();
+
+router.get(
+  "/",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
+  UserControllers.getAllUser
+);
 
 router.post(
   "/create-admin",
@@ -13,7 +19,7 @@ router.post(
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidations.createAdmin.parse(JSON.parse(req.body.data));
-    return userController.createAdmin(req, res, next);
+    return UserControllers.createAdmin(req, res, next);
   }
 );
 router.post(
@@ -21,7 +27,7 @@ router.post(
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidations.createVendor.parse(JSON.parse(req.body.data));
-    return userController.createVendor(req, res, next);
+    return UserControllers.createVendor(req, res, next);
   }
 );
 router.post(
@@ -29,8 +35,8 @@ router.post(
   upload.single("file"),
   (req: Request, res: Response, next: NextFunction) => {
     req.body = UserValidations.createCustomer.parse(JSON.parse(req.body.data));
-    return userController.createCustomer(req, res, next);
+    return UserControllers.createCustomer(req, res, next);
   }
 );
 
-export const userRoutes = router;
+export const UserRoutes = router;

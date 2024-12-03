@@ -1,10 +1,25 @@
 import { Request, Response } from "express";
-import { userService } from "./user.service";
 import { catchAsync } from "../../../shared/catchAsync";
 import { sendResponse } from "../../../shared/sendResponse";
+import { pick } from "../../../shared/pick";
+import { userFilterableFields } from "./user.constant";
+import { paginationField } from "../../constant/paginationField";
+import { UserServices } from "./user.service";
+
+const getAllUser = catchAsync(async (req: Request, res: Response) => {
+  const filters = pick(req.query, userFilterableFields);
+  const options = pick(req.query, paginationField);
+  const result = await UserServices.getAllUser(filters, options);
+
+  sendResponse(res, {
+    message: "User data fetched!",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.createAdmin(req);
+  const result = await UserServices.createAdmin(req);
 
   sendResponse(res, {
     message: "Admin Created Successfully",
@@ -13,7 +28,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createVendor = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.createVendor(req);
+  const result = await UserServices.createVendor(req);
 
   sendResponse(res, {
     message: "Vendor Created Successfully",
@@ -22,7 +37,7 @@ const createVendor = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createCustomer = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.createCustomer(req);
+  const result = await UserServices.createCustomer(req);
 
   sendResponse(res, {
     message: "Customer Created Successfully",
@@ -31,7 +46,10 @@ const createCustomer = catchAsync(async (req: Request, res: Response) => {
 });
 
 const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
-  const result = await userService.changeProfileStatus(req.params.id, req.body);
+  const result = await UserServices.changeProfileStatus(
+    req.params.id,
+    req.body
+  );
 
   sendResponse(res, {
     message: "User Profile Status Successfully",
@@ -39,7 +57,8 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-export const userController = {
+export const UserControllers = {
+  getAllUser,
   createAdmin,
   createVendor,
   createCustomer,

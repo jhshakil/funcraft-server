@@ -1,9 +1,75 @@
-import { Admin, Status, UserRole } from "@prisma/client";
+import { Admin, Prisma, Status, UserRole } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
 import { TFile } from "../../interfaces/file";
 import { Request } from "express";
+import { TPaginationOptions } from "../../interfaces/pagination";
+import { calculatePagination } from "../../../helpers/paginationHelper";
+import { userSearchableFields } from "./user.constant";
+
+const getAllUser = async (params: any, options: TPaginationOptions) => {
+  const { searchTerm, ...filterData } = params;
+  const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
+  const andConditions: Prisma.UserWhereInput[] = [];
+
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: userSearchableFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.UserWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.user.findMany({
+    where: whereConditions,
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    select: {
+      id: true,
+      email: true,
+      role: true,
+      status: true,
+      createdAt: true,
+      updateAt: true,
+      admin: true,
+      vendor: true,
+      customer: true,
+    },
+  });
+
+  const total = await prisma.user.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
 
 const createAdmin = async (req: Request): Promise<Admin> => {
   const file = req.file as TFile;
@@ -130,7 +196,8 @@ const changeProfileStatus = async (id: string, data: { status: Status }) => {
   return updateUserStatus;
 };
 
-export const userService = {
+export const UserServices = {
+  getAllUser,
   createAdmin,
   createVendor,
   createCustomer,
