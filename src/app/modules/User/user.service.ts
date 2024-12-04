@@ -13,11 +13,11 @@ const getAllUser = async (params: any, options: TPaginationOptions) => {
   const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
   const andConditions: Prisma.UserWhereInput[] = [];
 
-  if (params.searchTerm) {
+  if (searchTerm) {
     andConditions.push({
       OR: userSearchableFields.map((field) => ({
         [field]: {
-          contains: params.searchTerm,
+          contains: searchTerm,
           mode: "insensitive",
         },
       })),
