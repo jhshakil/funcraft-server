@@ -69,7 +69,7 @@ model Customer {
   updateAt        DateTime         @updatedAt
   deliveryAddress DeliveryAddress?
   order           Order[]
-  review          Review[]
+  review          Review?
 
   @@map("customers")
 }
@@ -86,6 +86,7 @@ model Shop {
   createdAt   DateTime   @default(now())
   updateAt    DateTime   @updatedAt
   product     Product[]
+  order       Order[]
 
   @@map("shops")
 }
@@ -134,20 +135,24 @@ model DeliveryAddress {
   address    String
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
+  order      Order[]
 
   @@map("deliveryAddresses")
 }
 
 model Order {
-  id                String         @id @default(uuid())
+  id                String          @id @default(uuid())
   customerId        String
-  customer          Customer       @relation(fields: [customerId], references: [id])
+  customer          Customer        @relation(fields: [customerId], references: [id])
   deliveryAddressId String
+  deliveryAddress   DeliveryAddress @relation(fields: [deliveryAddressId], references: [id])
+  shopId            String
+  shop              Shop            @relation(fields: [shopId], references: [id])
   totalPrice        Float
-  orderStatus       OrderStatus
-  paymentStatus     PaymentStatus
-  createdAt         DateTime       @default(now())
-  updateAt          DateTime       @updatedAt
+  orderStatus       OrderStatus     @default(PENDING)
+  paymentStatus     PaymentStatus   @default(UNPAID)
+  createdAt         DateTime        @default(now())
+  updateAt          DateTime        @updatedAt
   orderProduct      OrderProduct[]
 
   @@map("orders")
@@ -170,7 +175,7 @@ model Review {
   id         String   @id @default(uuid())
   productId  String
   product    Product  @relation(fields: [productId], references: [id])
-  customerId String
+  customerId String   @unique
   customer   Customer @relation(fields: [customerId], references: [id])
   ratting    Int
   review     String
@@ -206,6 +211,7 @@ enum ProductStatus {
 }
 
 enum OrderStatus {
+  PENDING
   DELIVERED
   BLOCKED
   CANCEL

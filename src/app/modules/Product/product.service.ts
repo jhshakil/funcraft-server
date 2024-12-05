@@ -74,6 +74,11 @@ const getProductById = async (id: string): Promise<Product> => {
       isDeleted: false,
       status: "PUBLISHED",
     },
+    include: {
+      category: true,
+      shop: true,
+      review: true,
+    },
   });
 
   return result;
