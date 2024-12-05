@@ -131,6 +131,7 @@ model DeliveryAddress {
   id         String   @id @default(uuid())
   customerId String   @unique
   customer   Customer @relation(fields: [customerId], references: [id], onDelete: Cascade)
+  address    String
   createdAt  DateTime @default(now())
   updateAt   DateTime @updatedAt
 
