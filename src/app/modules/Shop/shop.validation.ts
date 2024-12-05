@@ -10,6 +10,13 @@ const createShop = z.object({
   description: z.string().optional(),
 });
 
+const updateShop = z.object({
+  vendorId: z.string().optional(),
+  name: z.string().optional(),
+  description: z.string().optional(),
+});
+
 export const ShopValidations = {
   createShop,
+  updateShop,
 };

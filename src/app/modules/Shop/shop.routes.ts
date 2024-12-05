@@ -29,4 +29,33 @@ router.post(
   }
 );
 
+router.patch(
+  "/:id",
+  auth(UserRole.VENDOR),
+  upload.single("logo"),
+  (req: Request, res: Response, next: NextFunction) => {
+    req.body = ShopValidations.updateShop.parse(JSON.parse(req.body.data));
+    return ShopControllers.updateShop(req, res, next);
+  }
+);
+
+router.delete(
+  "/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
+  ShopControllers.deleteShop
+);
+
+router.patch(
+  "/status/:id",
+  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
+  ShopControllers.updateStatus
+);
+
+router.patch(
+  "/banner/:id",
+  auth(UserRole.VENDOR),
+  upload.single("banner"),
+  ShopControllers.updateBanner
+);
+
 export const ShopRoutes = router;

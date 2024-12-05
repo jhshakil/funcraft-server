@@ -34,8 +34,48 @@ const createShop = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateShop = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShopServices.updateShop(req.params.id, req);
+
+  sendResponse(res, {
+    message: "Shop Update Successfully",
+    data: result,
+  });
+});
+
+const deleteShop = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShopServices.deleteShop(req.params.id);
+
+  sendResponse(res, {
+    message: "Shop Delete Successfully",
+    data: result,
+  });
+});
+
+const updateStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShopServices.updateStatus(req.params.id, req.body);
+
+  sendResponse(res, {
+    message: "Shop Status Update Successfully",
+    data: result,
+  });
+});
+
+const updateBanner = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShopServices.updateBanner(req.params.id, req);
+
+  sendResponse(res, {
+    message: "Shop Banner Update Successfully",
+    data: result,
+  });
+});
+
 export const ShopControllers = {
   getAllShop,
   getShopById,
   createShop,
+  updateShop,
+  deleteShop,
+  updateStatus,
+  updateBanner,
 };
