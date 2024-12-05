@@ -5,13 +5,13 @@ import { Secret } from "jsonwebtoken";
 import config from "../../../config";
 import { emailSender } from "./emailSender";
 import ApiError from "../../errors/ApiError";
-import { Status } from "@prisma/client";
+import { UserStatus } from "@prisma/client";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
-      status: Status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -60,7 +60,7 @@ const refreshToken = async (token: string) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: decodedData?.email,
-      status: Status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -82,7 +82,7 @@ const changePassword = async (user: any, payload: any) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: user.email,
-      status: Status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -109,7 +109,7 @@ const forgotPassword = async (payload: { email: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
     where: {
       email: payload.email,
-      status: Status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 
@@ -146,7 +146,7 @@ const resetPassword = async (
   prisma.user.findUniqueOrThrow({
     where: {
       id: payload.id,
-      status: Status.ACTIVE,
+      status: UserStatus.ACTIVE,
     },
   });
 

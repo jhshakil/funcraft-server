@@ -1,4 +1,4 @@
-import { Admin, Prisma, Status, UserRole } from "@prisma/client";
+import { Admin, Prisma, UserRole, UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
@@ -179,7 +179,10 @@ const createCustomer = async (req: Request): Promise<Admin> => {
   return result;
 };
 
-const changeProfileStatus = async (id: string, data: { status: Status }) => {
+const changeProfileStatus = async (
+  id: string,
+  data: { status: UserStatus }
+) => {
   await prisma.user.findUniqueOrThrow({
     where: { id },
   });
