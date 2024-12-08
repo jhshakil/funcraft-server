@@ -41,7 +41,9 @@ const createCustomer = z.object({
 });
 
 const userProfileStatus = z.object({
-  status: z.enum([UserStatus.ACTIVE, UserStatus.BLOCKED, UserStatus.DELETED]),
+  body: z.object({
+    status: z.enum([UserStatus.ACTIVE, UserStatus.BLOCKED, UserStatus.DELETED]),
+  }),
 });
 
 export const UserValidations = {

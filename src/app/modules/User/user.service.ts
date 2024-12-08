@@ -49,7 +49,12 @@ const getAllUser = async (params: any, options: TPaginationOptions) => {
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.user.findMany({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      status: {
+        in: ["ACTIVE", "BLOCKED"],
+      },
+    },
     skip,
     take: limit,
     orderBy: {
@@ -83,22 +88,25 @@ const getAllUser = async (params: any, options: TPaginationOptions) => {
 };
 
 const getUserById = async (id: string, user: TAuthUser) => {
-  let result = {};
+  let result = null;
   if (user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN) {
     result = await prisma.admin.findUniqueOrThrow({
       where: {
         id,
+        isDeleted: false,
       },
       select: {
         email: true,
         id: true,
         name: true,
+        profilePhoto: true,
       },
     });
   } else if (user?.role === UserRole.VENDOR) {
     result = await prisma.vendor.findUniqueOrThrow({
       where: {
         id,
+        isDeleted: false,
       },
       select: {
         email: true,
@@ -113,6 +121,7 @@ const getUserById = async (id: string, user: TAuthUser) => {
     result = await prisma.vendor.findUniqueOrThrow({
       where: {
         id,
+        isDeleted: false,
       },
       select: {
         email: true,
@@ -121,6 +130,15 @@ const getUserById = async (id: string, user: TAuthUser) => {
         profilePhoto: true,
         address: true,
         contactNumber: true,
+      },
+    });
+  }
+
+  if (result?.email) {
+    await prisma.user.findUniqueOrThrow({
+      where: {
+        email: result.email,
+        status: "ACTIVE",
       },
     });
   }
@@ -309,20 +327,53 @@ const changeProfileStatus = async (
   id: string,
   data: { status: UserStatus }
 ) => {
+  console.log({ data });
   await prisma.user.findUniqueOrThrow({
     where: { id },
   });
 
-  const updateUserStatus = await prisma.user.update({
-    where: {
-      id,
-    },
-    data: {
-      status: data.status,
-    },
+  const result = await prisma.$transaction(async (TC) => {
+    const updateUserStatus = await TC.user.update({
+      where: {
+        id,
+      },
+      data: {
+        status: data.status,
+      },
+    });
+    if (updateUserStatus.role === "ADMIN") {
+      await TC.admin.update({
+        where: {
+          email: updateUserStatus.email,
+        },
+        data: {
+          isDeleted: data.status === "ACTIVE" ? false : true,
+        },
+      });
+    } else if (updateUserStatus.role === "VENDOR") {
+      await TC.vendor.update({
+        where: {
+          email: updateUserStatus.email,
+        },
+        data: {
+          isDeleted: data.status === "ACTIVE" ? false : true,
+        },
+      });
+    } else if (updateUserStatus.role === "CUSTOMER") {
+      await TC.customer.update({
+        where: {
+          email: updateUserStatus.email,
+        },
+        data: {
+          isDeleted: data.status === "ACTIVE" ? false : true,
+        },
+      });
+    }
+
+    return updateUserStatus;
   });
 
-  return updateUserStatus;
+  return result;
 };
 
 export const UserServices = {
