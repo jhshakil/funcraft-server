@@ -5,6 +5,7 @@ import { pick } from "../../../shared/pick";
 import { userFilterableFields } from "./user.constant";
 import { paginationField } from "../../constant/paginationField";
 import { UserServices } from "./user.service";
+import { TAuthUser } from "../../interfaces/common";
 
 const getAllUser = catchAsync(async (req: Request, res: Response) => {
   const filters = pick(req.query, userFilterableFields);
@@ -17,6 +18,20 @@ const getAllUser = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+
+const getUserById = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res: Response) => {
+    const result = await UserServices.getUserById(
+      req.params.id,
+      req.user as TAuthUser
+    );
+
+    sendResponse(res, {
+      message: "User Get Successfully",
+      data: result,
+    });
+  }
+);
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
   const result = await UserServices.createAdmin(req);
@@ -59,6 +74,7 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
 
 export const UserControllers = {
   getAllUser,
+  getUserById,
   createAdmin,
   createVendor,
   createCustomer,

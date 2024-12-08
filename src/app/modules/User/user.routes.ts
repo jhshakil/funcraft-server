@@ -13,6 +13,17 @@ router.get(
   UserControllers.getAllUser
 );
 
+router.get(
+  "/:id",
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.VENDOR,
+    UserRole.CUSTOMER
+  ),
+  UserControllers.getUserById
+);
+
 router.post(
   "/create-admin",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

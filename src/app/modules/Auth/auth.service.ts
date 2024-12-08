@@ -5,7 +5,7 @@ import { Secret } from "jsonwebtoken";
 import config from "../../../config";
 import { emailSender } from "./emailSender";
 import ApiError from "../../errors/ApiError";
-import { UserStatus } from "@prisma/client";
+import { UserRole, UserStatus } from "@prisma/client";
 
 const loginUser = async (payload: { email: string; password: string }) => {
   const userData = await prisma.user.findUniqueOrThrow({
@@ -24,10 +24,57 @@ const loginUser = async (payload: { email: string; password: string }) => {
     throw new Error("Password incorrect");
   }
 
+  let currentUser: { email: string; id: string; name: string } | null = null;
+
+  if (
+    userData?.role === UserRole.ADMIN ||
+    userData?.role === UserRole.SUPER_ADMIN
+  ) {
+    currentUser = await prisma.admin.findUniqueOrThrow({
+      where: {
+        email: userData.email,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+      },
+    });
+  } else if (userData?.role === UserRole.VENDOR) {
+    currentUser = await prisma.vendor.findUniqueOrThrow({
+      where: {
+        email: userData.email,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        profilePhoto: true,
+        address: true,
+        contactNumber: true,
+      },
+    });
+  } else if (userData?.role === UserRole.CUSTOMER) {
+    currentUser = await prisma.vendor.findUniqueOrThrow({
+      where: {
+        email: userData.email,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        profilePhoto: true,
+        address: true,
+        contactNumber: true,
+      },
+    });
+  }
+
   const accessToken = generateToken(
     {
       email: userData.email,
       role: userData.role,
+      id: currentUser?.id,
     },
     config.jwt.jwt_secret as Secret,
     config.jwt.expires_in as string
@@ -37,6 +84,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
     {
       email: userData.email,
       role: userData.role,
+      id: currentUser?.id,
     },
     config.jwt.refresh_token_secret as Secret,
     config.jwt.refresh_token_expires_in as string

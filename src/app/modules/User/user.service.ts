@@ -1,4 +1,11 @@
-import { Admin, Prisma, UserRole, UserStatus } from "@prisma/client";
+import {
+  Admin,
+  Customer,
+  Prisma,
+  UserRole,
+  UserStatus,
+  Vendor,
+} from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
 import { uploadToCloudinary } from "../../../helpers/fileUploader";
@@ -7,6 +14,10 @@ import { Request } from "express";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchableFields } from "./user.constant";
+import { generateToken } from "../../../helpers/jwtHelper";
+import config from "../../../config";
+import { Secret } from "jsonwebtoken";
+import { TAuthUser } from "../../interfaces/common";
 
 const getAllUser = async (params: any, options: TPaginationOptions) => {
   const { searchTerm, ...filterData } = params;
@@ -71,7 +82,53 @@ const getAllUser = async (params: any, options: TPaginationOptions) => {
   };
 };
 
-const createAdmin = async (req: Request): Promise<Admin> => {
+const getUserById = async (id: string, user: TAuthUser) => {
+  let result = {};
+  if (user?.role === UserRole.ADMIN || user?.role === UserRole.SUPER_ADMIN) {
+    result = await prisma.admin.findUniqueOrThrow({
+      where: {
+        id,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+      },
+    });
+  } else if (user?.role === UserRole.VENDOR) {
+    result = await prisma.vendor.findUniqueOrThrow({
+      where: {
+        id,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        profilePhoto: true,
+        address: true,
+        contactNumber: true,
+      },
+    });
+  } else if (user?.role === UserRole.CUSTOMER) {
+    result = await prisma.vendor.findUniqueOrThrow({
+      where: {
+        id,
+      },
+      select: {
+        email: true,
+        id: true,
+        name: true,
+        profilePhoto: true,
+        address: true,
+        contactNumber: true,
+      },
+    });
+  }
+
+  return result;
+};
+
+const createAdmin = async (req: Request) => {
   const file = req.file as TFile;
 
   const adminData: { email: string; name: string; profilePhoto?: string } = {
@@ -93,7 +150,7 @@ const createAdmin = async (req: Request): Promise<Admin> => {
   };
 
   const result = await prisma.$transaction(async (TC) => {
-    await TC.user.create({
+    const createUserData = await TC.user.create({
       data: userData,
     });
 
@@ -101,13 +158,36 @@ const createAdmin = async (req: Request): Promise<Admin> => {
       data: adminData,
     });
 
-    return createdAdminData;
+    const accessToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdAdminData.id,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+
+    const refreshToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdAdminData.id,
+      },
+      config.jwt.refresh_token_secret as Secret,
+      config.jwt.refresh_token_expires_in as string
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   });
 
   return result;
 };
 
-const createVendor = async (req: Request): Promise<Admin> => {
+const createVendor = async (req: Request) => {
   const file = req.file as TFile;
 
   const vendorData: { email: string; name: string; profilePhoto?: string } = {
@@ -129,7 +209,7 @@ const createVendor = async (req: Request): Promise<Admin> => {
   };
 
   const result = await prisma.$transaction(async (TC) => {
-    await TC.user.create({
+    const createUserData = await TC.user.create({
       data: userData,
     });
 
@@ -137,13 +217,36 @@ const createVendor = async (req: Request): Promise<Admin> => {
       data: vendorData,
     });
 
-    return createdVendorData;
+    const accessToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdVendorData.id,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+
+    const refreshToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdVendorData.id,
+      },
+      config.jwt.refresh_token_secret as Secret,
+      config.jwt.refresh_token_expires_in as string
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   });
 
   return result;
 };
 
-const createCustomer = async (req: Request): Promise<Admin> => {
+const createCustomer = async (req: Request) => {
   const file = req.file as TFile;
 
   const customerData: { email: string; name: string; profilePhoto?: string } = {
@@ -165,7 +268,7 @@ const createCustomer = async (req: Request): Promise<Admin> => {
   };
 
   const result = await prisma.$transaction(async (TC) => {
-    await TC.user.create({
+    const createUserData = await TC.user.create({
       data: userData,
     });
 
@@ -173,7 +276,30 @@ const createCustomer = async (req: Request): Promise<Admin> => {
       data: customerData,
     });
 
-    return createdCustomerData;
+    const accessToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdCustomerData.id,
+      },
+      config.jwt.jwt_secret as Secret,
+      config.jwt.expires_in as string
+    );
+
+    const refreshToken = generateToken(
+      {
+        email: createUserData.email,
+        role: createUserData.role,
+        id: createdCustomerData.id,
+      },
+      config.jwt.refresh_token_secret as Secret,
+      config.jwt.refresh_token_expires_in as string
+    );
+
+    return {
+      accessToken,
+      refreshToken,
+    };
   });
 
   return result;
@@ -201,6 +327,7 @@ const changeProfileStatus = async (
 
 export const UserServices = {
   getAllUser,
+  getUserById,
   createAdmin,
   createVendor,
   createCustomer,
