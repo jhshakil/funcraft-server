@@ -1,5 +1,4 @@
-import { NextFunction, Request, Response, Router } from "express";
-import { upload } from "../../../helpers/fileUploader";
+import { Router } from "express";
 import { UserValidations } from "./user.validation";
 import { auth } from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
@@ -28,27 +27,14 @@ router.get(
 router.post(
   "/create-admin",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  upload.single("file"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidations.createAdmin.parse(JSON.parse(req.body.data));
-    return UserControllers.createAdmin(req, res, next);
-  }
+  validateRequest(UserValidations.createAdmin),
+  UserControllers.createAdmin
 );
-router.post(
-  "/create-vendor",
-  upload.single("file"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidations.createVendor.parse(JSON.parse(req.body.data));
-    return UserControllers.createVendor(req, res, next);
-  }
-);
+router.post("/create-vendor");
 router.post(
   "/create-customer",
-  upload.single("file"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = UserValidations.createCustomer.parse(JSON.parse(req.body.data));
-    return UserControllers.createCustomer(req, res, next);
-  }
+  validateRequest(UserValidations.createCustomer),
+  UserControllers.createCustomer
 );
 
 router.patch(
@@ -56,6 +42,18 @@ router.patch(
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
   validateRequest(UserValidations.userProfileStatus),
   UserControllers.changeProfileStatus
+);
+
+router.patch(
+  "/profile",
+  auth(
+    UserRole.SUPER_ADMIN,
+    UserRole.ADMIN,
+    UserRole.CUSTOMER,
+    UserRole.VENDOR
+  ),
+  validateRequest(UserValidations.updateUserProfile),
+  UserControllers.updateUserProfile
 );
 
 export const UserRoutes = router;

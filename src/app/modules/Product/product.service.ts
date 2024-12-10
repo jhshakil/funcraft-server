@@ -1,7 +1,4 @@
-import { Request } from "express";
 import { prisma } from "../../../shared/prisma";
-import { TFile } from "../../interfaces/file";
-import { uploadToCloudinary } from "../../../helpers/fileUploader";
 import { Prisma, Product } from "@prisma/client";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
@@ -84,32 +81,26 @@ const getProductById = async (id: string): Promise<Product> => {
   return result;
 };
 
-const createProduct = async (req: Request): Promise<Product> => {
+const createProduct = async (payload: any): Promise<Product> => {
   await prisma.category.findUniqueOrThrow({
     where: {
-      id: req.body.categoryId,
+      id: payload.categoryId,
     },
   });
   await prisma.shop.findUniqueOrThrow({
     where: {
-      id: req.body.shopId,
+      id: payload.shopId,
     },
   });
-  const file = req.file as TFile;
-
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    req.body.thumbnailImage = upload?.secure_url;
-  }
 
   const result = await prisma.product.create({
-    data: req.body,
+    data: payload,
   });
 
   return result;
 };
 
-const updateProduct = async (id: string, req: Request) => {
+const updateProduct = async (id: string, payload: any) => {
   await prisma.product.findUniqueOrThrow({
     where: {
       id,
@@ -118,18 +109,11 @@ const updateProduct = async (id: string, req: Request) => {
     },
   });
 
-  const file = req.file as TFile;
-
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    req.body.thumbnailImage = upload?.secure_url;
-  }
-
   const result = await prisma.product.update({
     where: {
       id,
     },
-    data: req.body,
+    data: payload,
   });
 
   return result;

@@ -34,7 +34,7 @@ const getUserById = catchAsync(
 );
 
 const createAdmin = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.createAdmin(req);
+  const result = await UserServices.createAdmin(req.body);
 
   sendResponse(res, {
     message: "Admin Created Successfully",
@@ -43,7 +43,7 @@ const createAdmin = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createVendor = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.createVendor(req);
+  const result = await UserServices.createVendor(req.body);
 
   sendResponse(res, {
     message: "Vendor Created Successfully",
@@ -52,7 +52,7 @@ const createVendor = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createCustomer = catchAsync(async (req: Request, res: Response) => {
-  const result = await UserServices.createCustomer(req);
+  const result = await UserServices.createCustomer(req.body);
 
   sendResponse(res, {
     message: "Customer Created Successfully",
@@ -71,6 +71,19 @@ const changeProfileStatus = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const updateUserProfile = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res: Response) => {
+    const result = await UserServices.updateUserProfile(
+      req.body,
+      req.user as TAuthUser
+    );
+
+    sendResponse(res, {
+      message: "User Profile Update Successfully",
+      data: result,
+    });
+  }
+);
 
 export const UserControllers = {
   getAllUser,
@@ -79,4 +92,5 @@ export const UserControllers = {
   createVendor,
   createCustomer,
   changeProfileStatus,
+  updateUserProfile,
 };

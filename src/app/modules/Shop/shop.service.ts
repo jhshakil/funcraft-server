@@ -1,6 +1,3 @@
-import { Request } from "express";
-import { TFile } from "../../interfaces/file";
-import { uploadToCloudinary } from "../../../helpers/fileUploader";
 import { prisma } from "../../../shared/prisma";
 import { Prisma, Shop, ShopStatus } from "@prisma/client";
 import { TPaginationOptions } from "../../interfaces/pagination";
@@ -62,27 +59,21 @@ const getShopById = async (id: string) => {
   return result;
 };
 
-const createShop = async (req: Request): Promise<Shop> => {
+const createShop = async (payload: any): Promise<Shop> => {
   await prisma.vendor.findUniqueOrThrow({
     where: {
-      id: req.body.vendorId,
+      id: payload.vendorId,
     },
   });
-  const file = req.file as TFile;
-
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    req.body.logo = upload?.secure_url;
-  }
 
   const result = await prisma.shop.create({
-    data: req.body,
+    data: payload,
   });
 
   return result;
 };
 
-const updateShop = async (id: string, req: Request) => {
+const updateShop = async (id: string, payload: any) => {
   await prisma.shop.findUniqueOrThrow({
     where: {
       id,
@@ -90,18 +81,11 @@ const updateShop = async (id: string, req: Request) => {
     },
   });
 
-  const file = req.file as TFile;
-
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    req.body.logo = upload?.secure_url;
-  }
-
   const result = await prisma.shop.update({
     where: {
       id,
     },
-    data: req.body,
+    data: payload,
   });
 
   return result;
@@ -142,7 +126,7 @@ const updateStatus = async (id: string, payload: { status: ShopStatus }) => {
 
   return result;
 };
-const updateBanner = async (id: string, req: Request) => {
+const updateBanner = async (id: string, payload: any) => {
   await prisma.shop.findUniqueOrThrow({
     where: {
       id,
@@ -150,19 +134,12 @@ const updateBanner = async (id: string, req: Request) => {
     },
   });
 
-  const file = req.file as TFile;
-
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    req.body.banner = upload?.secure_url;
-  }
-
   const result = await prisma.shop.update({
     where: {
       id,
     },
     data: {
-      banner: req.body.banner,
+      banner: payload.banner,
     },
   });
 

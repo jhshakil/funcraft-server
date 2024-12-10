@@ -1,9 +1,9 @@
-import { NextFunction, Request, Response, Router } from "express";
+import { Router } from "express";
 import { auth } from "../../middlewares/auth";
 import { UserRole } from "@prisma/client";
 import { ShopControllers } from "./shop.controller";
-import { upload } from "../../../helpers/fileUploader";
 import { ShopValidations } from "./shop.validation";
+import { validateRequest } from "../../middlewares/validateRequest";
 
 const router = Router();
 
@@ -22,21 +22,15 @@ router.get(
 router.post(
   "/",
   auth(UserRole.VENDOR),
-  upload.single("logo"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = ShopValidations.createShop.parse(JSON.parse(req.body.data));
-    return ShopControllers.createShop(req, res, next);
-  }
+  validateRequest(ShopValidations.createShop),
+  ShopControllers.createShop
 );
 
 router.patch(
   "/:id",
   auth(UserRole.VENDOR),
-  upload.single("logo"),
-  (req: Request, res: Response, next: NextFunction) => {
-    req.body = ShopValidations.updateShop.parse(JSON.parse(req.body.data));
-    return ShopControllers.updateShop(req, res, next);
-  }
+  validateRequest(ShopValidations.updateShop),
+  ShopControllers.updateShop
 );
 
 router.delete(
@@ -54,7 +48,6 @@ router.patch(
 router.patch(
   "/banner/:id",
   auth(UserRole.VENDOR),
-  upload.single("banner"),
   ShopControllers.updateBanner
 );
 

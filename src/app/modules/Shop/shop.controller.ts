@@ -26,7 +26,7 @@ const getShopById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createShop = catchAsync(async (req: Request, res: Response) => {
-  const result = await ShopServices.createShop(req);
+  const result = await ShopServices.createShop(req.body);
 
   sendResponse(res, {
     message: "Shop Create Successfully",
@@ -35,7 +35,7 @@ const createShop = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateShop = catchAsync(async (req: Request, res: Response) => {
-  const result = await ShopServices.updateShop(req.params.id, req);
+  const result = await ShopServices.updateShop(req.params.id, req.body);
 
   sendResponse(res, {
     message: "Shop Update Successfully",
@@ -62,7 +62,7 @@ const updateStatus = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateBanner = catchAsync(async (req: Request, res: Response) => {
-  const result = await ShopServices.updateBanner(req.params.id, req);
+  const result = await ShopServices.updateBanner(req.params.id, req.body);
 
   sendResponse(res, {
     message: "Shop Banner Update Successfully",

@@ -28,7 +28,7 @@ const getProductById = catchAsync(async (req: Request, res: Response) => {
 });
 
 const createProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductServices.createProduct(req);
+  const result = await ProductServices.createProduct(req.body);
 
   sendResponse(res, {
     message: "Product Create Successfully",
@@ -37,7 +37,7 @@ const createProduct = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateProduct = catchAsync(async (req: Request, res: Response) => {
-  const result = await ProductServices.updateProduct(req.params.id, req);
+  const result = await ProductServices.updateProduct(req.params.id, req.body);
 
   sendResponse(res, {
     message: "Product Update Successfully",

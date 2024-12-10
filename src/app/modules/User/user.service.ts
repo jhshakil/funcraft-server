@@ -1,16 +1,6 @@
-import {
-  Admin,
-  Customer,
-  Prisma,
-  UserRole,
-  UserStatus,
-  Vendor,
-} from "@prisma/client";
+import { Prisma, UserRole, UserStatus } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { prisma } from "../../../shared/prisma";
-import { uploadToCloudinary } from "../../../helpers/fileUploader";
-import { TFile } from "../../interfaces/file";
-import { Request } from "express";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { userSearchableFields } from "./user.constant";
@@ -146,23 +136,16 @@ const getUserById = async (id: string, user: TAuthUser) => {
   return result;
 };
 
-const createAdmin = async (req: Request) => {
-  const file = req.file as TFile;
-
+const createAdmin = async (payload: any) => {
   const adminData: { email: string; name: string; profilePhoto?: string } = {
-    email: req.body.email,
-    name: req.body.name,
+    email: payload.email,
+    name: payload.name,
   };
 
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    adminData.profilePhoto = upload?.secure_url;
-  }
-
-  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
 
   const userData = {
-    email: req.body.email,
+    email: payload.email,
     password: hashedPassword,
     role: UserRole.ADMIN,
   };
@@ -205,23 +188,16 @@ const createAdmin = async (req: Request) => {
   return result;
 };
 
-const createVendor = async (req: Request) => {
-  const file = req.file as TFile;
-
+const createVendor = async (payload: any) => {
   const vendorData: { email: string; name: string; profilePhoto?: string } = {
-    email: req.body.email,
-    name: req.body.name,
+    email: payload.email,
+    name: payload.name,
   };
 
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    vendorData.profilePhoto = upload?.secure_url;
-  }
-
-  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
 
   const userData = {
-    email: req.body.email,
+    email: payload.email,
     password: hashedPassword,
     role: UserRole.VENDOR,
   };
@@ -264,23 +240,16 @@ const createVendor = async (req: Request) => {
   return result;
 };
 
-const createCustomer = async (req: Request) => {
-  const file = req.file as TFile;
-
+const createCustomer = async (payload: any) => {
   const customerData: { email: string; name: string; profilePhoto?: string } = {
-    email: req.body.email,
-    name: req.body.name,
+    email: payload.email,
+    name: payload.name,
   };
 
-  if (file) {
-    const upload = await uploadToCloudinary(file);
-    customerData.profilePhoto = upload?.secure_url;
-  }
-
-  const hashedPassword: string = await bcrypt.hash(req.body.password, 12);
+  const hashedPassword: string = await bcrypt.hash(payload.password, 12);
 
   const userData = {
-    email: req.body.email,
+    email: payload.email,
     password: hashedPassword,
     role: UserRole.CUSTOMER,
   };
@@ -327,7 +296,6 @@ const changeProfileStatus = async (
   id: string,
   data: { status: UserStatus }
 ) => {
-  console.log({ data });
   await prisma.user.findUniqueOrThrow({
     where: { id },
   });
@@ -376,6 +344,44 @@ const changeProfileStatus = async (
   return result;
 };
 
+const updateUserProfile = async (payload: any, user: TAuthUser) => {
+  const userRole = user?.role;
+  const userEmail = user?.email;
+
+  await prisma.user.findUniqueOrThrow({
+    where: { email: userEmail },
+  });
+
+  if (userRole === "ADMIN" || userRole === "SUPER_ADMIN") {
+    const result = await prisma.admin.update({
+      where: {
+        email: userEmail,
+      },
+      data: payload,
+    });
+
+    return result;
+  } else if (userRole === "VENDOR") {
+    const result = await prisma.vendor.update({
+      where: {
+        email: userEmail,
+      },
+      data: payload,
+    });
+
+    return result;
+  } else if (userRole === "CUSTOMER") {
+    const result = await prisma.customer.update({
+      where: {
+        email: userEmail,
+      },
+      data: payload,
+    });
+
+    return result;
+  }
+};
+
 export const UserServices = {
   getAllUser,
   getUserById,
@@ -383,4 +389,5 @@ export const UserServices = {
   createVendor,
   createCustomer,
   changeProfileStatus,
+  updateUserProfile,
 };
