@@ -2,9 +2,6 @@ import { z } from "zod";
 
 const createShop = z.object({
   body: z.object({
-    vendorId: z.string({
-      required_error: "Vendor Id is required",
-    }),
     name: z.string({
       required_error: "Shop name is required",
     }),

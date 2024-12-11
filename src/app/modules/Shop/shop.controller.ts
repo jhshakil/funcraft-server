@@ -4,6 +4,7 @@ import { ShopServices } from "./shop.service";
 import { sendResponse } from "../../../shared/sendResponse";
 import { pick } from "../../../shared/pick";
 import { paginationField } from "../../constant/paginationField";
+import { TAuthUser } from "../../interfaces/common";
 
 const getAllShop = catchAsync(async (req: Request, res: Response) => {
   const options = pick(req.query, paginationField);
@@ -25,14 +26,19 @@ const getShopById = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const createShop = catchAsync(async (req: Request, res: Response) => {
-  const result = await ShopServices.createShop(req.body);
+const createShop = catchAsync(
+  async (req: Request & { user?: TAuthUser }, res: Response) => {
+    const result = await ShopServices.createShop(
+      req.body,
+      req.user as TAuthUser
+    );
 
-  sendResponse(res, {
-    message: "Shop Create Successfully",
-    data: result,
-  });
-});
+    sendResponse(res, {
+      message: "Shop Create Successfully",
+      data: result,
+    });
+  }
+);
 
 const updateShop = catchAsync(async (req: Request, res: Response) => {
   const result = await ShopServices.updateShop(req.params.id, req.body);

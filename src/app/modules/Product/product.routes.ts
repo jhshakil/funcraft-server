@@ -8,6 +8,7 @@ import { validateRequest } from "../../middlewares/validateRequest";
 const router = Router();
 
 router.get("/", ProductControllers.getAllProduct);
+router.get("/shop/:id", ProductControllers.getAllProductByVendor);
 router.get("/:id", ProductControllers.getProductById);
 router.post(
   "/",

@@ -3,6 +3,7 @@ import { Prisma, Shop, ShopStatus } from "@prisma/client";
 import { TPaginationOptions } from "../../interfaces/pagination";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { shopSearchableFields } from "./shop.constant";
+import { TAuthUser } from "../../interfaces/common";
 
 const getAllShop = async (params: any, options: TPaginationOptions) => {
   const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
@@ -59,12 +60,14 @@ const getShopById = async (id: string) => {
   return result;
 };
 
-const createShop = async (payload: any): Promise<Shop> => {
-  await prisma.vendor.findUniqueOrThrow({
+const createShop = async (payload: any, user: TAuthUser): Promise<Shop> => {
+  const vendorData = await prisma.vendor.findUniqueOrThrow({
     where: {
-      id: payload.vendorId,
+      email: user?.email,
     },
   });
+
+  payload.vendorId = vendorData.id;
 
   const result = await prisma.shop.create({
     data: payload,

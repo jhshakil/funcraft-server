@@ -18,6 +18,24 @@ const getAllProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllProductByVendor = catchAsync(
+  async (req: Request, res: Response) => {
+    const filters = pick(req.query, productFilterableFields);
+    const options = pick(req.query, paginationField);
+    const result = await ProductServices.getAllProductByVendor(
+      filters,
+      options,
+      req.params.shopId
+    );
+
+    sendResponse(res, {
+      message: "Products Get successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
 const getProductById = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductServices.getProductById(req.params.id);
 
@@ -56,6 +74,7 @@ const deleteProduct = catchAsync(async (req: Request, res: Response) => {
 
 export const ProductControllers = {
   getAllProduct,
+  getAllProductByVendor,
   getProductById,
   createProduct,
   updateProduct,

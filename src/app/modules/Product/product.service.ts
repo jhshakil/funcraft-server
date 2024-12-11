@@ -64,6 +64,71 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
   };
 };
 
+const getAllProductByVendor = async (
+  params: any,
+  options: TPaginationOptions,
+  shopId: string
+) => {
+  const { searchTerm, ...filterData } = params;
+  const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
+  const andConditions: Prisma.ProductWhereInput[] = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: productSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.ProductWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.product.findMany({
+    where: {
+      shopId,
+      ...whereConditions,
+      isDeleted: false,
+      status: "PUBLISHED",
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      category: true,
+      shop: true,
+    },
+  });
+
+  const total = await prisma.product.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 const getProductById = async (id: string): Promise<Product> => {
   const result = await prisma.product.findUniqueOrThrow({
     where: {
@@ -136,6 +201,7 @@ const deleteProduct = async (id: string) => {
 
 export const ProductServices = {
   getAllProduct,
+  getAllProductByVendor,
   getProductById,
   createProduct,
   updateProduct,
