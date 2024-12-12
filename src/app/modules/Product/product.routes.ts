@@ -23,6 +23,10 @@ router.patch(
   ProductControllers.updateProduct
 );
 
-router.delete("/:id", ProductControllers.deleteProduct);
+router.delete(
+  "/:id",
+  auth(UserRole.VENDOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  ProductControllers.deleteProduct
+);
 
 export const ProductRoutes = router;

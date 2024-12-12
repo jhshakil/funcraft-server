@@ -7,11 +7,7 @@ import { CategoryValidations } from "./category.validation";
 
 const router = Router();
 
-router.get(
-  "/",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  CategoryControllers.getAllCategory
-);
+router.get("/", CategoryControllers.getAllCategory);
 router.get(
   "/:id",
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),

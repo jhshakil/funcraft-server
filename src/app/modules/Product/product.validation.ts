@@ -12,6 +12,7 @@ const createProduct = z.object({
       required_error: "Name is required",
     }),
     description: z.string().optional(),
+    thumbnailImage: z.string().optional(),
     price: z.number({
       required_error: "Price is required",
     }),

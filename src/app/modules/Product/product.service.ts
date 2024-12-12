@@ -102,7 +102,6 @@ const getAllProductByVendor = async (
       shopId,
       ...whereConditions,
       isDeleted: false,
-      status: "PUBLISHED",
     },
     skip,
     take: limit,
@@ -185,11 +184,16 @@ const updateProduct = async (id: string, payload: any) => {
 };
 
 const deleteProduct = async (id: string) => {
+  await prisma.product.findUniqueOrThrow({
+    where: {
+      id,
+      isDeleted: false,
+    },
+  });
   const result = await prisma.product.update({
     where: {
       id,
       isDeleted: false,
-      status: "PUBLISHED",
     },
     data: {
       isDeleted: true,
