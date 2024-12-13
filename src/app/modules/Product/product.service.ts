@@ -20,13 +20,35 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
     });
   }
 
+  // if (Object.keys(filterData).length > 0) {
+  //   andConditions.push({
+  //     AND: Object.keys(filterData).map((key) => ({
+  //       [key]: {
+  //         equals: (filterData as any)[key],
+  //       },
+  //     })),
+  //   });
+  // }
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
-      AND: Object.keys(filterData).map((key) => ({
-        [key]: {
-          equals: (filterData as any)[key],
-        },
-      })),
+      AND: Object.keys(filterData).map((key) => {
+        if (key === "category") {
+          return {
+            category: {
+              name: {
+                equals: (filterData as any)[key],
+                mode: "insensitive", // Optional: for case-insensitive comparison
+              },
+            },
+          };
+        } else {
+          return {
+            [key]: {
+              equals: (filterData as any)[key],
+            },
+          };
+        }
+      }),
     });
   }
 
