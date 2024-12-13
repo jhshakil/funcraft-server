@@ -59,6 +59,16 @@ const getShopById = async (id: string) => {
 
   return result;
 };
+const getShopByVendorId = async (id: string) => {
+  const result = await prisma.shop.findFirstOrThrow({
+    where: {
+      vendorId: id,
+      status: "ACTIVE",
+    },
+  });
+
+  return result;
+};
 
 const createShop = async (payload: any, user: TAuthUser): Promise<Shop> => {
   const vendorData = await prisma.vendor.findUniqueOrThrow({
@@ -152,6 +162,7 @@ const updateBanner = async (id: string, payload: any) => {
 export const ShopServices = {
   getAllShop,
   getShopById,
+  getShopByVendorId,
   createShop,
   updateShop,
   deleteShop,

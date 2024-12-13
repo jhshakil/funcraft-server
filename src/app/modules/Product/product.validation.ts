@@ -37,7 +37,14 @@ const updateProduct = z.object({
   }),
 });
 
+const updateProductStatus = z.object({
+  body: z.object({
+    status: z.enum(["PUBLISHED", "DRAFT", "BLOCKED"]),
+  }),
+});
+
 export const ProductValidations = {
   createProduct,
   updateProduct,
+  updateProductStatus,
 };

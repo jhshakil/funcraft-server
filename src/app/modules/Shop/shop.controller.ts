@@ -25,6 +25,14 @@ const getShopById = catchAsync(async (req: Request, res: Response) => {
     data: result,
   });
 });
+const getShopByVendorId = catchAsync(async (req: Request, res: Response) => {
+  const result = await ShopServices.getShopByVendorId(req.params.id);
+
+  sendResponse(res, {
+    message: "Shop Get Successfully",
+    data: result,
+  });
+});
 
 const createShop = catchAsync(
   async (req: Request & { user?: TAuthUser }, res: Response) => {
@@ -79,6 +87,7 @@ const updateBanner = catchAsync(async (req: Request, res: Response) => {
 export const ShopControllers = {
   getAllShop,
   getShopById,
+  getShopByVendorId,
   createShop,
   updateShop,
   deleteShop,

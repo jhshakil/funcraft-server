@@ -18,6 +18,11 @@ router.get(
   auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
   ShopControllers.getShopById
 );
+router.get(
+  "/vendor/:id",
+  auth(UserRole.VENDOR),
+  ShopControllers.getShopByVendorId
+);
 
 router.post(
   "/",

@@ -23,6 +23,13 @@ router.patch(
   ProductControllers.updateProduct
 );
 
+router.patch(
+  "/status/:id",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  validateRequest(ProductValidations.updateProductStatus),
+  ProductControllers.updateProductStatus
+);
+
 router.delete(
   "/:id",
   auth(UserRole.VENDOR, UserRole.ADMIN, UserRole.SUPER_ADMIN),

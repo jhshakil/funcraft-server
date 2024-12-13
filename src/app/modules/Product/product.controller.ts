@@ -63,6 +63,18 @@ const updateProduct = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const updateProductStatus = catchAsync(async (req: Request, res: Response) => {
+  const result = await ProductServices.updateProductStatus(
+    req.params.id,
+    req.body
+  );
+
+  sendResponse(res, {
+    message: "Product Status Update Successfully",
+    data: result,
+  });
+});
+
 const deleteProduct = catchAsync(async (req: Request, res: Response) => {
   const result = await ProductServices.deleteProduct(req.params.id);
 
@@ -78,5 +90,6 @@ export const ProductControllers = {
   getProductById,
   createProduct,
   updateProduct,
+  updateProductStatus,
   deleteProduct,
 };
