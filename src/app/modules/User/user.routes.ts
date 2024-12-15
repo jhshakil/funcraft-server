@@ -30,11 +30,15 @@ router.post(
   validateRequest(UserValidations.createAdmin),
   UserControllers.createAdmin
 );
-router.post("/create-vendor");
+router.post(
+  "/create-vendor",
+  validateRequest(UserValidations.createVendor),
+  UserControllers.createVendor
+);
 router.post(
   "/create-customer",
   validateRequest(UserValidations.createCustomer),
-  UserControllers.createCustomer
+  UserControllers.createVendor
 );
 
 router.patch(

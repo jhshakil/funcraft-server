@@ -20,15 +20,6 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
     });
   }
 
-  // if (Object.keys(filterData).length > 0) {
-  //   andConditions.push({
-  //     AND: Object.keys(filterData).map((key) => ({
-  //       [key]: {
-  //         equals: (filterData as any)[key],
-  //       },
-  //     })),
-  //   });
-  // }
   if (Object.keys(filterData).length > 0) {
     andConditions.push({
       AND: Object.keys(filterData).map((key) => {
@@ -37,7 +28,7 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
             category: {
               name: {
                 equals: (filterData as any)[key],
-                mode: "insensitive", // Optional: for case-insensitive comparison
+                mode: "insensitive",
               },
             },
           };
@@ -191,7 +182,6 @@ const updateProduct = async (id: string, payload: any) => {
     where: {
       id,
       isDeleted: false,
-      status: "PUBLISHED",
     },
   });
 
