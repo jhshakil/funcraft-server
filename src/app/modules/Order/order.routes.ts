@@ -19,6 +19,12 @@ router.get(
   OrderControllers.getAllOrderByShop
 );
 
+router.get(
+  "/customer/:id",
+  auth(UserRole.CUSTOMER),
+  OrderControllers.getAllOrderByCustomer
+);
+
 router.post(
   "/",
   auth(UserRole.CUSTOMER),

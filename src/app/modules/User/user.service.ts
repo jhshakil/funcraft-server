@@ -108,7 +108,7 @@ const getUserById = async (id: string, user: TAuthUser) => {
       },
     });
   } else if (user?.role === UserRole.CUSTOMER) {
-    result = await prisma.vendor.findUniqueOrThrow({
+    result = await prisma.customer.findUniqueOrThrow({
       where: {
         id,
         isDeleted: false,
@@ -118,7 +118,7 @@ const getUserById = async (id: string, user: TAuthUser) => {
         id: true,
         name: true,
         profilePhoto: true,
-        address: true,
+        deliveryAddress: true,
         contactNumber: true,
       },
     });

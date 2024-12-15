@@ -125,6 +125,70 @@ const getAllOrderByShop = async (
   };
 };
 
+const getAllOrderByCustomer = async (
+  params: any,
+  options: TPaginationOptions,
+  customerId: string
+) => {
+  const { searchTerm, ...filterData } = params;
+  const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
+  const andConditions: Prisma.OrderWhereInput[] = [];
+
+  if (searchTerm) {
+    andConditions.push({
+      OR: productSearchableFields.map((field) => ({
+        [field]: {
+          contains: searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  if (Object.keys(filterData).length > 0) {
+    andConditions.push({
+      AND: Object.keys(filterData).map((key) => ({
+        [key]: {
+          equals: (filterData as any)[key],
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.OrderWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.order.findMany({
+    where: {
+      ...whereConditions,
+      customerId,
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      orderProduct: true,
+      shop: true,
+      customer: true,
+    },
+  });
+
+  const total = await prisma.order.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
 const createOrder = async (payload: any) => {
   const result = await prisma.$transaction(async (TC) => {
     const orderData = await TC.order.create({
@@ -194,6 +258,7 @@ const updateOrder = async (id: string, payload: any) => {
 export const OrderServices = {
   getAllOrder,
   getAllOrderByShop,
+  getAllOrderByCustomer,
   createOrder,
   updateOrder,
 };

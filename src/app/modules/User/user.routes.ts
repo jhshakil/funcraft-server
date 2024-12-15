@@ -38,7 +38,7 @@ router.post(
 router.post(
   "/create-customer",
   validateRequest(UserValidations.createCustomer),
-  UserControllers.createVendor
+  UserControllers.createCustomer
 );
 
 router.patch(

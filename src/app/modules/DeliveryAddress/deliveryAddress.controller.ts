@@ -3,6 +3,14 @@ import { catchAsync } from "../../../shared/catchAsync";
 import { DeliveryAddressServices } from "./deliveryAddress.service";
 import { sendResponse } from "../../../shared/sendResponse";
 
+const getAddressById = catchAsync(async (req: Request, res: Response) => {
+  const result = await DeliveryAddressServices.getAddressById(req.params.id);
+
+  sendResponse(res, {
+    message: "Address Get Successfully",
+    data: result,
+  });
+});
 const createDeliveryAddress = catchAsync(
   async (req: Request, res: Response) => {
     const result = await DeliveryAddressServices.createDeliveryAddress(
@@ -31,6 +39,7 @@ const updateDeliveryAddress = catchAsync(
 );
 
 export const DeliveryAddressControllers = {
+  getAddressById,
   createDeliveryAddress,
   updateDeliveryAddress,
 };

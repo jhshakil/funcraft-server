@@ -55,7 +55,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
       },
     });
   } else if (userData?.role === UserRole.CUSTOMER) {
-    currentUser = await prisma.vendor.findUniqueOrThrow({
+    currentUser = await prisma.customer.findUniqueOrThrow({
       where: {
         email: userData.email,
       },
@@ -64,7 +64,7 @@ const loginUser = async (payload: { email: string; password: string }) => {
         id: true,
         name: true,
         profilePhoto: true,
-        address: true,
+        deliveryAddress: true,
         contactNumber: true,
       },
     });

@@ -7,6 +7,11 @@ import { DeliveryAddressValidations } from "./deliveryAddress.validation";
 
 const router = Router();
 
+router.get(
+  "/:id",
+  auth(UserRole.CUSTOMER),
+  DeliveryAddressControllers.getAddressById
+);
 router.post(
   "/",
   auth(UserRole.CUSTOMER),

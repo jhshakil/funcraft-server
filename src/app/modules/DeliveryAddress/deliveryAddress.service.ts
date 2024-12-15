@@ -1,5 +1,15 @@
 import { prisma } from "../../../shared/prisma";
 
+const getAddressById = async (customerId: string) => {
+  const result = await prisma.deliveryAddress.findUniqueOrThrow({
+    where: {
+      customerId,
+    },
+  });
+
+  return result;
+};
+
 const createDeliveryAddress = async (payload: {
   customerId: string;
   address: string;
@@ -34,6 +44,7 @@ const updateDeliveryAddress = async (
 };
 
 export const DeliveryAddressServices = {
+  getAddressById,
   createDeliveryAddress,
   updateDeliveryAddress,
 };

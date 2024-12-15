@@ -34,6 +34,24 @@ const getAllOrderByShop = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getAllOrderByCustomer = catchAsync(
+  async (req: Request, res: Response) => {
+    const filters = pick(req.query, orderFilterableFields);
+    const options = pick(req.query, paginationField);
+    const result = await OrderServices.getAllOrderByCustomer(
+      filters,
+      options,
+      req.params.id
+    );
+
+    sendResponse(res, {
+      message: "Orders Get successfully",
+      meta: result.meta,
+      data: result.data,
+    });
+  }
+);
+
 const createOrder = catchAsync(async (req: Request, res: Response) => {
   const result = await OrderServices.createOrder(req.body);
 
@@ -55,6 +73,7 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
 export const OrderControllers = {
   getAllOrder,
   getAllOrderByShop,
+  getAllOrderByCustomer,
   createOrder,
   updateOrder,
 };
