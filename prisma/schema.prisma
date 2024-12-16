@@ -151,6 +151,7 @@ model Order {
   totalPrice        Float
   orderStatus       OrderStatus     @default(PENDING)
   paymentStatus     PaymentStatus   @default(UNPAID)
+  transactionId     String?
   createdAt         DateTime        @default(now())
   updateAt          DateTime        @updatedAt
   orderProduct      OrderProduct[]

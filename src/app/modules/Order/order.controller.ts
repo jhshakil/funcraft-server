@@ -70,10 +70,20 @@ const updateOrder = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const cancelOrder = catchAsync(async (req: Request, res: Response) => {
+  const result = await OrderServices.CancelOrder(req.params.id);
+
+  sendResponse(res, {
+    message: "Order Cancel Successfully",
+    data: result,
+  });
+});
+
 export const OrderControllers = {
   getAllOrder,
   getAllOrderByShop,
   getAllOrderByCustomer,
   createOrder,
   updateOrder,
+  cancelOrder,
 };

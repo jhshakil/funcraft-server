@@ -169,7 +169,12 @@ const getAllOrderByCustomer = async (
       [sortBy]: sortOrder,
     },
     include: {
-      orderProduct: true,
+      orderProduct: {
+        include: {
+          product: true,
+        },
+      },
+      deliveryAddress: true,
       shop: true,
       customer: true,
     },
@@ -255,10 +260,54 @@ const updateOrder = async (id: string, payload: any) => {
   return result;
 };
 
+const CancelOrder = async (id: string) => {
+  await prisma.order.findUniqueOrThrow({
+    where: {
+      id,
+      orderStatus: {
+        not: "DELIVERED",
+      },
+    },
+  });
+
+  const result = await prisma.$transaction(async (TC) => {
+    const orderData = await TC.order.update({
+      where: {
+        id,
+      },
+      data: {
+        // orderStatus: "PENDING",
+        orderStatus: "CANCEL",
+      },
+      include: {
+        orderProduct: true,
+      },
+    });
+
+    for (const product of orderData.orderProduct) {
+      const productRecord = await TC.product.findUniqueOrThrow({
+        where: { id: product.productId },
+      });
+
+      await TC.product.update({
+        where: { id: product.productId },
+        data: {
+          inventoryCount: productRecord.inventoryCount + product.quantity,
+        },
+      });
+    }
+
+    return orderData;
+  });
+
+  return result;
+};
+
 export const OrderServices = {
   getAllOrder,
   getAllOrderByShop,
   getAllOrderByCustomer,
   createOrder,
   updateOrder,
+  CancelOrder,
 };
