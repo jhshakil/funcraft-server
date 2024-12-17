@@ -25,7 +25,7 @@ const getAllProductByVendor = catchAsync(
     const result = await ProductServices.getAllProductByVendor(
       filters,
       options,
-      req.params.shopId
+      req.params.id
     );
 
     sendResponse(res, {

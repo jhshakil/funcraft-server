@@ -8,6 +8,11 @@ import { validateRequest } from "../../middlewares/validateRequest";
 const router = Router();
 
 router.get("/", ShopControllers.getAllShop);
+router.get(
+  "/admin",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  ShopControllers.getAllShopByAdmin
+);
 
 router.get("/:id", ShopControllers.getShopById);
 router.get(

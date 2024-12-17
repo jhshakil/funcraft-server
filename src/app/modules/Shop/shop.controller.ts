@@ -16,6 +16,16 @@ const getAllShop = catchAsync(async (req: Request, res: Response) => {
     data: result.data,
   });
 });
+const getAllShopByAdmin = catchAsync(async (req: Request, res: Response) => {
+  const options = pick(req.query, paginationField);
+  const result = await ShopServices.getAllShopByAdmin(req.query, options);
+
+  sendResponse(res, {
+    message: "Shops Get Successfully",
+    meta: result.meta,
+    data: result.data,
+  });
+});
 
 const getShopById = catchAsync(async (req: Request, res: Response) => {
   const result = await ShopServices.getShopById(req.params.id);
@@ -86,6 +96,7 @@ const updateBanner = catchAsync(async (req: Request, res: Response) => {
 
 export const ShopControllers = {
   getAllShop,
+  getAllShopByAdmin,
   getShopById,
   getShopByVendorId,
   createShop,

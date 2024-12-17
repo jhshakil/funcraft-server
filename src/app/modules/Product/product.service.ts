@@ -51,6 +51,9 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
       ...whereConditions,
       isDeleted: false,
       status: "PUBLISHED",
+      shop: {
+        status: "ACTIVE",
+      },
     },
     skip,
     take: limit,
@@ -67,6 +70,10 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
     where: {
       ...whereConditions,
       isDeleted: false,
+      status: "PUBLISHED",
+      shop: {
+        status: "ACTIVE",
+      },
     },
   });
 
@@ -115,8 +122,8 @@ const getAllProductByVendor = async (
 
   const result = await prisma.product.findMany({
     where: {
-      shopId,
       ...whereConditions,
+      shopId,
       isDeleted: false,
     },
     skip,
@@ -133,6 +140,7 @@ const getAllProductByVendor = async (
   const total = await prisma.product.count({
     where: {
       ...whereConditions,
+      shopId,
       isDeleted: false,
     },
   });

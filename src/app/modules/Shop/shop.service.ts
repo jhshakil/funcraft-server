@@ -24,6 +24,53 @@ const getAllShop = async (params: any, options: TPaginationOptions) => {
     andConditions.length > 0 ? { AND: andConditions } : {};
 
   const result = await prisma.shop.findMany({
+    where: {
+      ...whereConditions,
+      status: "ACTIVE",
+    },
+    skip,
+    take: limit,
+    orderBy: {
+      [sortBy]: sortOrder,
+    },
+    include: {
+      vendor: true,
+    },
+  });
+
+  const total = await prisma.shop.count({
+    where: whereConditions,
+  });
+
+  return {
+    meta: {
+      page,
+      limit,
+      total,
+    },
+    data: result,
+  };
+};
+
+const getAllShopByAdmin = async (params: any, options: TPaginationOptions) => {
+  const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
+  const andConditions: Prisma.ShopWhereInput[] = [];
+
+  if (params.searchTerm) {
+    andConditions.push({
+      OR: shopSearchableFields.map((field) => ({
+        [field]: {
+          contains: params.searchTerm,
+          mode: "insensitive",
+        },
+      })),
+    });
+  }
+
+  const whereConditions: Prisma.ShopWhereInput =
+    andConditions.length > 0 ? { AND: andConditions } : {};
+
+  const result = await prisma.shop.findMany({
     where: whereConditions,
     skip,
     take: limit,
@@ -168,6 +215,7 @@ const updateBanner = async (id: string, payload: any) => {
 
 export const ShopServices = {
   getAllShop,
+  getAllShopByAdmin,
   getShopById,
   getShopByVendorId,
   createShop,
