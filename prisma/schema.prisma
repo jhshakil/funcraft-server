@@ -42,17 +42,18 @@ model Admin {
 }
 
 model Vendor {
-  id            String   @id @default(uuid())
-  email         String   @unique
-  user          User     @relation(fields: [email], references: [email])
+  id            String      @id @default(uuid())
+  email         String      @unique
+  user          User        @relation(fields: [email], references: [email])
   name          String
   profilePhoto  String?
-  isDeleted     Boolean  @default(false)
+  isDeleted     Boolean     @default(false)
   contactNumber String?
   address       String?
-  createdAt     DateTime @default(now())
-  updateAt      DateTime @updatedAt
+  createdAt     DateTime    @default(now())
+  updateAt      DateTime    @updatedAt
   shop          Shop?
+  couponCode    CouponCode?
 
   @@map("vendors")
 }
@@ -184,6 +185,19 @@ model Review {
   updateAt   DateTime @updatedAt
 
   @@map("reviews")
+}
+
+model CouponCode {
+  id       String @id @default(uuid())
+  code     String @unique
+  discount String
+  vendorId String @unique
+  vendor   Vendor @relation(fields: [vendorId], references: [id])
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@map("couponCodes")
 }
 
 enum UserRole {
