@@ -64,7 +64,10 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
   });
 
   const total = await prisma.product.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      isDeleted: false,
+    },
   });
 
   return {
@@ -128,7 +131,10 @@ const getAllProductByVendor = async (
   });
 
   const total = await prisma.product.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      isDeleted: false,
+    },
   });
 
   return {

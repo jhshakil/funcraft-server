@@ -55,6 +55,13 @@ const getShopById = async (id: string) => {
       id,
       status: "ACTIVE",
     },
+    include: {
+      product: {
+        where: {
+          isDeleted: false,
+        },
+      },
+    },
   });
 
   return result;

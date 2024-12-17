@@ -7,17 +7,9 @@ import { validateRequest } from "../../middlewares/validateRequest";
 
 const router = Router();
 
-router.get(
-  "/",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN),
-  ShopControllers.getAllShop
-);
+router.get("/", ShopControllers.getAllShop);
 
-router.get(
-  "/:id",
-  auth(UserRole.SUPER_ADMIN, UserRole.ADMIN, UserRole.VENDOR),
-  ShopControllers.getShopById
-);
+router.get("/:id", ShopControllers.getShopById);
 router.get(
   "/vendor/:id",
   auth(UserRole.VENDOR),

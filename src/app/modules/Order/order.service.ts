@@ -70,6 +70,8 @@ const getAllOrderByShop = async (
   const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
   const andConditions: Prisma.OrderWhereInput[] = [];
 
+  console.log(shopId);
+
   if (searchTerm) {
     andConditions.push({
       OR: productSearchableFields.map((field) => ({
