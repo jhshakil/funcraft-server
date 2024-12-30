@@ -46,6 +46,12 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
               }),
             },
           };
+        } else if (key === "flashSales") {
+          return {
+            discount: {
+              gte: 1,
+            },
+          };
         } else {
           return {
             [key]: {
@@ -60,6 +66,17 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
   const whereConditions: Prisma.ProductWhereInput =
     andConditions.length > 0 ? { AND: andConditions } : {};
 
+  const orderBy =
+    sortBy === "bestSelling"
+      ? {
+          orderProduct: {
+            _count: sortOrder as Prisma.SortOrder,
+          },
+        }
+      : {
+          [sortBy]: sortOrder,
+        };
+
   const result = await prisma.product.findMany({
     where: {
       ...whereConditions,
@@ -71,12 +88,11 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
     },
     skip,
     take: limit,
-    orderBy: {
-      [sortBy]: sortOrder,
-    },
+    orderBy,
     include: {
       category: true,
       shop: true,
+      ...(filterData.sortBy === "bestSelling" && { orderProduct: true }),
     },
   });
 
