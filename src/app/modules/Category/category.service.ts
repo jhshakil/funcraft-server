@@ -30,6 +30,21 @@ const getAllCategory = async (params: any, options: TPaginationOptions) => {
     orderBy: {
       [sortBy]: sortOrder,
     },
+    include: {
+      _count: {
+        select: {
+          product: {
+            where: {
+              isDeleted: false,
+              status: "PUBLISHED",
+              shop: {
+                status: "ACTIVE",
+              },
+            },
+          },
+        },
+      },
+    },
   });
 
   const total = await prisma.category.count({

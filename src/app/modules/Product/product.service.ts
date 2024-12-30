@@ -8,6 +8,9 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
   const { searchTerm, ...filterData } = params;
   const { limit, page, skip, sortBy, sortOrder } = calculatePagination(options);
   const andConditions: Prisma.ProductWhereInput[] = [];
+  const categories = filterData.category
+    ? (filterData.category as string).split(",")
+    : [];
 
   if (searchTerm) {
     andConditions.push({
@@ -27,9 +30,20 @@ const getAllProduct = async (params: any, options: TPaginationOptions) => {
           return {
             category: {
               name: {
-                equals: (filterData as any)[key],
+                in: categories,
                 mode: "insensitive",
               },
+            },
+          };
+        } else if (key === "minPrice" || key === "maxPrice") {
+          return {
+            price: {
+              ...(key === "minPrice" && {
+                gte: parseFloat((filterData as any)[key]),
+              }),
+              ...(key === "maxPrice" && {
+                lte: parseFloat((filterData as any)[key]),
+              }),
             },
           };
         } else {
