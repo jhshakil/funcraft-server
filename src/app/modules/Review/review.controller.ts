@@ -28,8 +28,21 @@ const deleteReview = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const checkForReview = catchAsync(async (req: Request, res: Response) => {
+  const result = await ReviewServices.checkForReview(
+    req?.query?.customerId as string,
+    req?.query?.productId as string
+  );
+
+  sendResponse(res, {
+    message: "Review check Successfully",
+    data: `${result}`,
+  });
+});
+
 export const ReviewControllers = {
   createReview,
   updateReview,
   deleteReview,
+  checkForReview,
 };

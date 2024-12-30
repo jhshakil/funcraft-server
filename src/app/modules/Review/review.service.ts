@@ -40,8 +40,35 @@ const deleteReview = async (id: string): Promise<Review> => {
   return result;
 };
 
+const checkForReview = async (
+  customerId: string,
+  productId: string
+): Promise<boolean> => {
+  await prisma.customer.findUniqueOrThrow({
+    where: {
+      id: customerId,
+      isDeleted: false,
+    },
+  });
+
+  const order = await prisma.order.findFirst({
+    where: {
+      customerId: customerId,
+      paymentStatus: "PAID",
+      orderProduct: {
+        some: {
+          productId: productId,
+        },
+      },
+    },
+  });
+
+  return order !== null;
+};
+
 export const ReviewServices = {
   createReview,
   updateReview,
   deleteReview,
+  checkForReview,
 };
