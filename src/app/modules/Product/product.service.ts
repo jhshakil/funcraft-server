@@ -199,7 +199,17 @@ const getProductById = async (id: string): Promise<Product> => {
     },
   });
 
-  return result;
+  const { _avg, _count } = await prisma.review.aggregate({
+    where: { productId: id },
+    _avg: { ratting: true },
+    _count: { ratting: true },
+  });
+
+  return {
+    ...result,
+    ratting: _avg.ratting || 0,
+    reviewCount: _count.ratting || 0,
+  };
 };
 
 const createProduct = async (payload: any): Promise<Product> => {

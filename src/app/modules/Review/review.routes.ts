@@ -12,6 +12,17 @@ router.get(
   auth(UserRole.CUSTOMER),
   ReviewControllers.checkForReview
 );
+router.get("/product", ReviewControllers.getReviewByProductId);
+router.get(
+  "/",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  ReviewControllers.getAllReview
+);
+router.get(
+  "/customer/:customerId",
+  auth(UserRole.CUSTOMER),
+  ReviewControllers.getAllUserReview
+);
 router.post(
   "/",
   auth(UserRole.CUSTOMER),
@@ -24,6 +35,10 @@ router.patch(
   validateRequest(ReviewValidations.updateReview),
   ReviewControllers.updateReview
 );
-router.delete("/:id", auth(UserRole.CUSTOMER), ReviewControllers.deleteReview);
+router.delete(
+  "/:id",
+  auth(UserRole.CUSTOMER, UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  ReviewControllers.deleteReview
+);
 
 export const ReviewRoutes = router;
