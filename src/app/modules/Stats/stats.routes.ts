@@ -11,4 +11,16 @@ router.get(
   StatsControllers.getAllUserStats
 );
 
+router.get(
+  "/vendor/:id",
+  auth(UserRole.VENDOR),
+  StatsControllers.getAllVendorStats
+);
+
+router.get(
+  "/admin",
+  auth(UserRole.ADMIN, UserRole.SUPER_ADMIN),
+  StatsControllers.getAllAdminStats
+);
+
 export const StatsRouters = router;
