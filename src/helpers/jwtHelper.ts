@@ -5,6 +5,7 @@ export const generateToken = (
   secret: Secret,
   expiresIn: string
 ) => {
+  // @ts-ignore
   const token = jwt.sign(payload, secret, {
     algorithm: "HS256",
     expiresIn,

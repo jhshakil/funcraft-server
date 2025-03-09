@@ -1,6 +1,5 @@
 {
   "name": "FunCraft-Server",
-  "packageManager": "yarn@4.4.1",
   "scripts": {
     "dev": "tsnd --respawn src/server.ts",
     "prod": "NODE_ENV=production node ./dist/server.js",
