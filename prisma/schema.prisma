@@ -201,6 +201,16 @@ model CouponCode {
   @@map("couponCodes")
 }
 
+model Subscribe {
+  id    String @id @default(uuid())
+  email String @unique
+
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@map("subscribes")
+}
+
 enum UserRole {
   SUPER_ADMIN
   ADMIN

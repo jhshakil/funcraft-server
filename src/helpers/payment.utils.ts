@@ -54,7 +54,7 @@ export const verifyPayment = async (tnxId: string) => {
     });
 
     return response.data;
-  } catch (err) {
+  } catch (err: any) {
     throw new Error("Payment validation failed!");
   }
 };
