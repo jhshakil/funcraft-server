@@ -1,4 +1,4 @@
-import { Prisma } from "@prisma/client";
+import { OrderStatus, Prisma } from "@prisma/client";
 import { calculatePagination } from "../../../helpers/paginationHelper";
 import { prisma } from "../../../shared/prisma";
 import { TPaginationOptions } from "../../interfaces/pagination";
@@ -114,7 +114,10 @@ const getAllOrderByShop = async (
   });
 
   const total = await prisma.order.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      shopId,
+    },
   });
 
   return {
@@ -164,6 +167,9 @@ const getAllOrderByCustomer = async (
     where: {
       ...whereConditions,
       customerId,
+      orderStatus: {
+        notIn: [OrderStatus.CANCEL, OrderStatus.BLOCKED],
+      },
     },
     skip,
     take: limit,
@@ -183,7 +189,13 @@ const getAllOrderByCustomer = async (
   });
 
   const total = await prisma.order.count({
-    where: whereConditions,
+    where: {
+      ...whereConditions,
+      customerId,
+      orderStatus: {
+        notIn: [OrderStatus.CANCEL, OrderStatus.BLOCKED],
+      },
+    },
   });
 
   return {
